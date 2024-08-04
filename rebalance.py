@@ -16,6 +16,7 @@ dir_results = '/home/cmu-linux/repos/stock-screening/screeningResults/'
 account_no = '235427167'
 position_core = 'SPAXX**'
 
+
 # Read lines of a csv file.
 def read_lines(file):
     infile = open(dir_downloads+f'{file}', 'r')
