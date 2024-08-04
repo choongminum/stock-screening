@@ -36,7 +36,7 @@ def get_tickers_new(file_new):
 
 
 # Recommend which stocks to trade.
-def recommend_trades(file_new, file_current, indicator_buffett):
+def recommend_trades(file_new, file_current, indicator_buffett, write):
     lines = read_lines(file_current)
     tickers_new = get_tickers_new(file_new)
 
@@ -52,19 +52,20 @@ def recommend_trades(file_new, file_current, indicator_buffett):
                 tickers_current.append(tokens[2])
     per_stock = account_total / indicator_buffett / len(tickers_new)
 
-    # Write the new tickers to a file.
-    date_today = datetime.datetime.now().strftime('%y%m%d')
-    outfile = open(dir_results + f'{date_today}.txt', 'w')
-    outfile.write(
-            f'Balance: ${account_total}\n'
-            f'Buffett Indicator: {indicator_buffett}\n'
-            '\n'
-            '// Zacks //\n'
-            'Supreme Valuation\t\tMorningstar\n'
-            )
-    for element in tickers_new:
-        outfile.write(f'{element}\n')
-    outfile.close()
+    # If specified, write the new tickers to a file.
+    if write:
+        date_today = datetime.datetime.now().strftime('%y%m%d')
+        outfile = open(dir_results+f'{date_today}.txt', 'w')
+        outfile.write(
+                f'Balance: ${account_total}\n'
+                f'Buffett Indicator: {indicator_buffett}\n'
+                '\n'
+                '// Zacks //\n'
+                'Supreme Valuation\t\tMorningstar\n'
+                )
+        for element in tickers_new:
+            outfile.write(f'{element}\n')
+        outfile.close()
 
     # Determine which tickers to sell, rebalance, and buy.
     tickers_sell = set(tickers_current) - (
@@ -115,6 +116,12 @@ def get_args():
             type=float,
             help='Buffett Indicator'
             )
+    parser.add_argument(
+            'write',
+            nargs='?',
+            default='true',
+            help='whether or not to write the result to a file'
+            )
     args = parser.parse_args()
     return args
 
@@ -125,7 +132,8 @@ def main():
             recommend_trades(
                 args.file_new,
                 args.file_current,
-                args.indicator_buffett
+                args.indicator_buffett,
+                args.write.lower()=='true'
                 ),
             sort_dicts=False
             )
