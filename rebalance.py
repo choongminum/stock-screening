@@ -7,12 +7,13 @@ Stock Screener result.
 
 import argparse
 import datetime
+import os
 import yfinance as yf
 from pprint import pprint
 
 # Enter user-specific information.
 dir_downloads = '/mnt/c/Users/funda/Downloads/'
-dir_results = '/home/cmu-linux/repos/stock-screening/screeningResults/'
+dir_results = os.path.join(os.path.dirname(__file__), 'screeningResults/')
 account_no = '235427167'
 position_core = 'SPAXX**'
 
