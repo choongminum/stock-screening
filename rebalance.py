@@ -10,10 +10,15 @@ import datetime
 import yfinance as yf
 from pprint import pprint
 
+# Enter user-specific information.
+dir_downloads = '/mnt/c/Users/funda/Downloads/'
+dir_results = '/home/cmu-linux/repos/stock-screening/screeningResults/'
+account_no = '235427167'
+position_core = 'SPAXX**'
 
 # Read lines of a csv file.
 def read_lines(file):
-    infile = open(f'/mnt/c/Users/funda/Downloads/{file}', 'r')
+    infile = open(dir_downloads+f'{file}', 'r')
     lines = infile.readlines()
     infile.close()
     return lines
@@ -39,19 +44,16 @@ def recommend_trades(file_new, file_current, indicator_buffett):
     tickers_current = []
     for line in lines:
         tokens = line.split(',')
-        if line.startswith('235427167'):
+        if line.startswith(account_no):
             if tokens[7] != '':
                 account_total = account_total + float(tokens[7].strip('$'))
-            if tokens[2] not in ['SPAXX**', 'Pending Activity']:
+            if tokens[2] not in [position_core, 'Pending Activity']:
                 tickers_current.append(tokens[2])
     per_stock = account_total / indicator_buffett / len(tickers_new)
 
     # Write the new tickers to a file.
     date_today = datetime.datetime.now().strftime('%y%m%d')
-    outfile = open(
-            '/home/cmu-linux/stockTrading/screeningResults/'
-            f'{date_today}.txt', 'w'
-            )
+    outfile = open(dir_results + f'{date_today}.txt', 'w')
     outfile.write(
             f'Balance: ${account_total}\n'
             f'Buffett Indicator: {indicator_buffett}\n'
@@ -75,10 +77,10 @@ def recommend_trades(file_new, file_current, indicator_buffett):
     dict_buy = {}
     for line in lines:
         tokens = line.split(',')
-        if line.startswith('235427167'):
+        if line.startswith(account_no):
             if tokens[2] in tickers_rebalance:
                 dict_rebalance[tokens[2]] = round(
-                        (per_stock-float(tokens[7].strip('$'))) 
+                        (per_stock - float(tokens[7].strip('$'))) 
                         / yf.Ticker(tokens[2]).info['currentPrice']
                         )
     for element in tickers_buy:
