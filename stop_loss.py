@@ -19,23 +19,16 @@ position_core = 'SPAXX**'
 def get_stop_loss(file):
     lines = read_lines(file)
 
-    # Determine current tickers.
-    tickers_current = []
+    # Create a dictionary with the stop-loss price per stock.
+    dict_stop_loss = {}
     for line in lines:
         tokens = line.split(',')
         if line.startswith(account_no):
             if tokens[2] not in [position_core, 'Pending Activity']:
-                tickers_current.append(tokens[2])
-
-    # Create a dictionary with the stop-loss price per stock.
-    dict_stop_loss = {}
-    for element in tickers_current:
-        price_stop_loss = round(
-                0.9 * yf.Ticker(element).info['currentPrice'],
-                2
-                )
-        dict_stop_loss[element] = f'${price_stop_loss}'
-
+                dict_stop_loss[f'{tokens[2]}'] = round(
+                        0.9 * float(tokens[14].strip('$')),
+                        2
+                        )
     return dict_stop_loss
 
 
