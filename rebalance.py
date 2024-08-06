@@ -58,7 +58,7 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
         date_today = datetime.datetime.now().strftime('%y%m%d')
         outfile = open(dir_results+f'{date_today}.txt', 'w')
         outfile.write(
-                f'Balance: ${account_total}\n'
+                f'Balance: ${account_total:.2f}\n'
                 f'Buffett Indicator: {indicator_buffett}\n'
                 '\n'
                 '// Zacks //\n'
@@ -91,10 +91,10 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
                 per_stock / yf.Ticker(element).info['currentPrice']
                 )
     trade_stocks = {
-            'Account Total': f'${account_total}',
+            'Account Total': f'${account_total:.2f}',
             'Stocks': sorted(tickers_new),
             'Number of Stocks': len(tickers_new),
-            'Amount Per Stock': f'${round(per_stock, 2)}',
+            'Amount Per Stock': f'${per_stock:.2f}',
             'Sell': sorted(tickers_sell),
             'Rebalance': dict_rebalance,
             'Buy': dict_buy
