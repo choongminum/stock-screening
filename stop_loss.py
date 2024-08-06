@@ -25,10 +25,8 @@ def get_stop_loss(file):
         tokens = line.split(',')
         if line.startswith(account_no):
             if tokens[2] not in [position_core, 'Pending Activity']:
-                dict_stop_loss[f'{tokens[2]}'] = round(
-                        0.9 * float(tokens[14].strip('$')),
-                        2
-                        )
+                price = 0.9 * float(tokens[14].strip('$'))
+                dict_stop_loss[f'{tokens[2]}'] = f'${price:.2f}'
     return dict_stop_loss
 
 
