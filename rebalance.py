@@ -49,6 +49,9 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
         if line.startswith(account_no):
             if tokens[7] != '':
                 account_total = account_total + float(tokens[7].strip('$'))
+            else:
+                pending = tokens[6].split('$')[0] + tokens[6].split('$')[1]
+                account_total = account_total + float(pending)
             if tokens[2] not in [position_core, 'Pending Activity']:
                 tickers_current.append(tokens[2])
     per_stock = account_total / indicator_buffett / len(tickers_new)
