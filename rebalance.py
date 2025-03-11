@@ -30,7 +30,7 @@ def get_tickers_new(file_new):
     tickers_new = []
     lines = read_lines(file_new)
     for line in lines[1:]:
-        tokens = line.split(',')
+        tokens = line.split('","')
         tickers_new.append(tokens[1].replace('"', ''))
     return tickers_new
 
