@@ -57,7 +57,7 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
                 tickers_current.append(tokens[2])
     per_stock = account_total / indicator_buffett / len(tickers_new)
 
-    # If specified, write the new tickers to a file.
+    # Unless specified otherwise, write the new tickers to a file.
     if write:
         date_today = datetime.datetime.now().strftime("%y%m%d")
         outfile = open(
