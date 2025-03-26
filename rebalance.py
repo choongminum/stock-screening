@@ -11,15 +11,15 @@ import yfinance as yf
 from pprint import pprint
 
 # Enter user-specific information.
-dir_downloads = '/mnt/c/Users/funda/Downloads/'
-dir_results = '/home/cmu-linux/screeningResults/'
-account_no = '235427167'
-position_core = 'SPAXX**'
+dir_downloads = "/mnt/c/Users/funda/Downloads/"
+dir_results = "/home/cmu-linux/screeningResults/"
+account_no = {"Z05672323": "Stock Trading", "235427167": "Rollover IRA"}
+position_core = ["FZFXX**", "SPAXX**"]
 
 
 # Read lines of a csv file.
 def read_lines(file):
-    infile = open(dir_downloads+f'{file}', 'r')
+    infile = open(dir_downloads + f"{file}", "r")
     lines = infile.readlines()
     infile.close()
     return lines
@@ -31,7 +31,7 @@ def get_tickers_new(file_new):
     lines = read_lines(file_new)
     for line in lines[1:]:
         tokens = line.split('","')
-        tickers_new.append(tokens[1].replace('"', ''))
+        tickers_new.append(tokens[1].replace('"', ""))
     return tickers_new
 
 
@@ -41,39 +41,44 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
     tickers_new = get_tickers_new(file_new)
 
     # Determine account total, amount per stock, and current tickers.
+    account_num = 0
     account_total = 0
     tickers_current = []
     for line in lines:
-        tokens = line.split(',')
-        if line.startswith(account_no):
-            if tokens[7] != '':
-                account_total = account_total + float(tokens[7].strip('$'))
+        tokens = line.split(",")
+        if tokens[0] in account_no.keys():
+            account_num = tokens[0]
+            if tokens[7] != "":
+                account_total = account_total + float(tokens[7].strip("$"))
             else:
-                pending = tokens[6].split('$')[0] + tokens[6].split('$')[1]
+                pending = tokens[6].split("$")[0] + tokens[6].split("$")[1]
                 account_total = account_total + float(pending)
-            if tokens[2] not in [position_core, 'Pending Activity']:
+            if tokens[2] not in [*position_core, "Pending Activity"]:
                 tickers_current.append(tokens[2])
     per_stock = account_total / indicator_buffett / len(tickers_new)
 
     # If specified, write the new tickers to a file.
     if write:
-        date_today = datetime.datetime.now().strftime('%y%m%d')
-        outfile = open(dir_results+f'{date_today}.txt', 'w')
+        date_today = datetime.datetime.now().strftime("%y%m%d")
+        outfile = open(
+            dir_results + f"{account_num}/" + f"{date_today}.txt", "w"
+        )
         outfile.write(
-                f'Balance: ${account_total:.2f}\n'
-                f'Buffett Indicator: {indicator_buffett}\n'
-                '\n'
-                '// Zacks //\n'
-                'Supreme Valuation\t\tMorningstar\n'
-                )
+            f"Account: {account_num}\n"
+            f"Balance: ${account_total:.2f}\n"
+            f"Buffett Indicator: {indicator_buffett}\n"
+            "\n"
+            "// Zacks //\n"
+            "Supreme Valuation\n"
+        )
         for element in tickers_new:
-            outfile.write(f'{element}\n')
+            outfile.write(f"{element}\n")
         outfile.close()
 
     # Determine which tickers to sell, rebalance, and buy.
     tickers_sell = set(tickers_current) - (
-            set(tickers_new) & set(tickers_current)
-            )
+        set(tickers_new) & set(tickers_current)
+    )
     tickers_rebalance = set(tickers_new) & set(tickers_current)
     tickers_buy = set(tickers_new) - (set(tickers_new) & set(tickers_current))
 
@@ -81,50 +86,48 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
     dict_rebalance = {}
     dict_buy = {}
     for line in lines:
-        tokens = line.split(',')
-        if line.startswith(account_no):
+        tokens = line.split(",")
+        if tokens[0] in account_no.keys():
             if tokens[2] in tickers_rebalance:
                 dict_rebalance[tokens[2]] = round(
-                        (per_stock - float(tokens[7].strip('$'))) 
-                        / yf.Ticker(tokens[2]).info['currentPrice']
-                        )
+                    (per_stock - float(tokens[7].strip("$")))
+                    / yf.Ticker(tokens[2]).info["currentPrice"]
+                )
     for element in tickers_buy:
         dict_buy[element] = round(
-                per_stock / yf.Ticker(element).info['currentPrice']
-                )
+            per_stock / yf.Ticker(element).info["currentPrice"]
+        )
     trade_stocks = {
-            'Account Total': f'${account_total:.2f}',
-            'Stocks': sorted(tickers_new),
-            'Number of Stocks': len(tickers_new),
-            'Amount Per Stock': f'${per_stock:.2f}',
-            'Sell': sorted(tickers_sell),
-            'Rebalance': dict_rebalance,
-            'Buy': dict_buy
-            }
+        "Stocks": sorted(tickers_new),
+        "Number of Stocks": len(tickers_new),
+        "Account Total": f"${account_total:.2f}",
+        "Amount Per Stock": f"${per_stock:.2f}",
+        "Sell": sorted(tickers_sell),
+        "Rebalance": dict_rebalance,
+        "Buy": dict_buy,
+    }
 
     return trade_stocks
 
 
 def get_args():
     parser = argparse.ArgumentParser(
-            description=(
-                'This module helps to rebalance my portfolio according to the '
-                'Zacks Stock Screener result.'
-                )
-            )
-    parser.add_argument('file_new', help='Zacks Stock Screener result file')
-    parser.add_argument('file_current', help='current portfolio file')
+        description=(
+            "This module helps to rebalance my portfolio according to the "
+            "Zacks Stock Screener result."
+        )
+    )
+    parser.add_argument("file_new", help="Zacks Stock Screener result file")
+    parser.add_argument("file_current", help="current portfolio file")
     parser.add_argument(
-            'indicator_buffett',
-            type=float,
-            help='Buffett Indicator'
-            )
+        "indicator_buffett", type=float, help="Buffett Indicator"
+    )
     parser.add_argument(
-            'write',
-            nargs='?',
-            default='true',
-            help='whether or not to write the result to a file'
-            )
+        "write",
+        nargs="?",
+        default="true",
+        help="whether or not to write the result to a file",
+    )
     args = parser.parse_args()
     return args
 
@@ -132,15 +135,15 @@ def get_args():
 def main():
     args = get_args()
     pprint(
-            recommend_trades(
-                args.file_new,
-                args.file_current,
-                args.indicator_buffett,
-                args.write.lower()=='true'
-                ),
-            sort_dicts=False
-            )
+        recommend_trades(
+            args.file_new,
+            args.file_current,
+            args.indicator_buffett,
+            args.write.lower() == "true",
+        ),
+        sort_dicts=False,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
