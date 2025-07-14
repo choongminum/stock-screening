@@ -69,7 +69,7 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
             f"Buffett Indicator: {indicator_buffett}\n"
             "\n"
             "// Zacks //\n"
-            "Supreme Valuation\n"
+            "Momentum, Quality, and Valuation\n"
         )
         for element in tickers_new:
             outfile.write(f"{element}\n")
