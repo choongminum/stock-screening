@@ -36,7 +36,9 @@ def get_tickers_new(file_new):
 
 
 # Recommend which stocks to trade.
-def recommend_trades(file_new, file_current, indicator_buffett, write):
+def recommend_trades(
+    file_new, file_current, indicator_buffett, indicator_ms, write
+):
     lines = read_lines(file_current)
     tickers_new = get_tickers_new(file_new)
 
@@ -55,7 +57,11 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
                 account_total = account_total + float(pending)
             if tokens[2] not in [*position_core, "Pending Activity"]:
                 tickers_current.append(tokens[2])
-    per_stock = account_total / indicator_buffett / len(tickers_new)
+    per_stock = (
+        account_total
+        / ((indicator_buffett + indicator_ms) / 2)
+        / len(tickers_new)
+    )
 
     # Unless specified otherwise, write the new tickers to a file.
     if write:
@@ -67,6 +73,7 @@ def recommend_trades(file_new, file_current, indicator_buffett, write):
             f"Account: {account_num}\n"
             f"Balance: ${account_total:.2f}\n"
             f"Buffett Indicator: {indicator_buffett}\n"
+            f"Morningstar U.S. Market Fair Value: {indicator_ms}\n"
             "\n"
             "// Zacks //\n"
             "Return and Value\n"
@@ -123,6 +130,9 @@ def get_args():
         "indicator_buffett", type=float, help="Buffett Indicator"
     )
     parser.add_argument(
+        "indicator_ms", type=float, help="Morningstar U.S. Market Fair Value"
+    )
+    parser.add_argument(
         "write",
         nargs="?",
         default="true",
@@ -139,6 +149,7 @@ def main():
             args.file_new,
             args.file_current,
             args.indicator_buffett,
+            args.indicator_ms,
             args.write.lower() == "true",
         ),
         sort_dicts=False,
