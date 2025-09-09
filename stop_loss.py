@@ -23,7 +23,11 @@ def get_stop_loss(file):
     for line in lines:
         tokens = line.split(",")
         if tokens[0] in account_no.keys():
-            if tokens[2] not in [*position_core, "Pending Activity"]:
+            if tokens[2] not in [
+                *position_core,
+                "Pending Activity",
+                "Pending activity",
+            ]:
                 price = 0.9 * float(tokens[14].strip("$"))
                 dict_stop_loss[f"{tokens[2]}"] = f"${price:.2f}"
     return dict_stop_loss
