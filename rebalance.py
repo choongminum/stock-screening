@@ -11,8 +11,8 @@ import yfinance as yf
 from pprint import pprint
 
 # Enter user-specific information.
-dir_downloads = "/mnt/c/Users/funda/Downloads/"
-dir_results = "/home/cmu-linux/screeningResults/"
+dir_downloads = "/home/cmu/Downloads/"
+dir_results = "/home/cmu/screening_results/"
 account_no = {"Z05672323": "Stock Trading", "235427167": "Rollover IRA"}
 position_core = ["FZFXX**", "SPAXX**"]
 
