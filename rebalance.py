@@ -55,7 +55,11 @@ def recommend_trades(
             else:
                 pending = tokens[6].split("$")[0] + tokens[6].split("$")[1]
                 account_total = account_total + float(pending)
-            if tokens[2] not in [*position_core, "Pending Activity"]:
+            if tokens[2] not in [
+                *position_core,
+                "Pending Activity",
+                "Pending activity",
+            ]:
                 tickers_current.append(tokens[2])
     per_stock = (
         account_total
