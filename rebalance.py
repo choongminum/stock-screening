@@ -51,7 +51,7 @@ def recommend_trades(
         if tokens[0] in account_no.keys():
             account_num = tokens[0]
             if tokens[7] != "":
-                account_total = account_total + float(tokens[7].strip("$"))
+                account_total = account_total + float(tokens[7].strip("-$"))
             else:
                 pending = tokens[6].split("$")[0] + tokens[6].split("$")[1]
                 account_total = account_total + float(pending)
