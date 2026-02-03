@@ -101,7 +101,7 @@ def recommend_trades(
         if tokens[0] in account_no.keys():
             if tokens[2] in tickers_rebalance:
                 dict_rebalance[tokens[2]] = round(
-                    (per_stock - float(tokens[7].strip("$")))
+                    (per_stock - float(tokens[7].strip("-$")))
                     / yf.Ticker(tokens[2]).info["currentPrice"]
                 )
     for element in tickers_buy:
