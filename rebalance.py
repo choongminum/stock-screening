@@ -51,9 +51,9 @@ def recommend_trades(
         if tokens[0] in account_no.keys():
             account_num = tokens[0]
             if tokens[7] != "":
-                account_total = account_total + float(tokens[7].strip("-$"))
+                account_total = account_total + float(tokens[7].replace("$", ""))
             else:
-                pending = tokens[6].split("$")[0] + tokens[6].split("$")[1]
+                pending = tokens[6].replace("$", "")
                 account_total = account_total + float(pending)
             if tokens[2] not in [
                 *position_core,
@@ -101,7 +101,7 @@ def recommend_trades(
         if tokens[0] in account_no.keys():
             if tokens[2] in tickers_rebalance:
                 dict_rebalance[tokens[2]] = round(
-                    (per_stock - float(tokens[7].strip("-$")))
+                    (per_stock - float(tokens[7].replace("$", "")))
                     / yf.Ticker(tokens[2]).info["currentPrice"]
                 )
     for element in tickers_buy:
